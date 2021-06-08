@@ -9,8 +9,8 @@ import com.epam.esm.web.exception.InvalidUpdateFieldsException;
 import com.epam.esm.web.link.LinkAdder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
@@ -39,6 +39,7 @@ public class GiftCertificateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('certificates:create')")
     public GiftCertificateDto create(@RequestBody @Valid GiftCertificateDto giftCertificateDto) {
         GiftCertificate giftCertificate = certificateDtoConverter.convertToEntity(giftCertificateDto);
         giftCertificate = giftCertificateService.create(giftCertificate);
@@ -92,6 +93,7 @@ public class GiftCertificateController {
     
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('certificates:update')")
     public GiftCertificateDto updateById(@PathVariable("id") long id,
                                          @RequestBody GiftCertificateDto giftCertificateDto) {
         validateFields(giftCertificateDto);
@@ -105,6 +107,7 @@ public class GiftCertificateController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('certificates:delete')")
     public void deleteById(@PathVariable("id") long id) {
         giftCertificateService.deleteById(id);
     }

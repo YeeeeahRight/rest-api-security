@@ -12,6 +12,7 @@ import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.link.LinkAdder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,17 +38,6 @@ public class UserController {
         this.tagService = tagService;
         this.userDtoConverter = userDtoConverter;
         this.userDtoLinkAdder = userDtoLinkAdder;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@RequestBody @Valid UserDto userDto) {
-        User user = userDtoConverter.convertToEntity(userDto);
-        user = userService.create(user);
-
-        UserDto resultUserDto = userDtoConverter.convertToDto(user);
-        userDtoLinkAdder.addLinks(resultUserDto);
-        return resultUserDto;
     }
 
     @GetMapping("{id}/best_tag")
