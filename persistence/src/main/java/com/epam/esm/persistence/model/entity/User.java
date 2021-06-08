@@ -10,7 +10,7 @@ import java.util.*;
 @Table(name = "users")
 public class User extends AbstractEntity {
 
-    @Column(name = "username", length = 60, nullable = false)
+    @Column(name = "username", length = 60, nullable = false, unique = true)
     private String username;
 
     @Column(name = "first_name", length = 80, nullable = false)
@@ -19,7 +19,7 @@ public class User extends AbstractEntity {
     @Column(name = "last_name", length = 80, nullable = false)
     private String lastName;
 
-    @Column(name = "email", length = 80, nullable = false)
+    @Column(name = "email", length = 80, nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", length = 100, nullable = false)
