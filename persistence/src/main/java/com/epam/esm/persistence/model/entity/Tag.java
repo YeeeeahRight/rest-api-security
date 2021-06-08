@@ -11,10 +11,10 @@ import java.util.List;
 @Table(name = "tags")
 public class Tag extends AbstractEntity{
 
-    @Column(length = 60, nullable = false, unique = true)
+    @Column(name="name", length = 60, nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "tags")
     private List<GiftCertificate> certificates = new ArrayList<>();
 
     public Tag() {
