@@ -16,6 +16,7 @@ public interface UserService {
      *
      * @param userDto User to create
      * @return created User
+     * @throws NoSuchEntityException when role is not found
      */
     User create(User userDto);
 
@@ -37,4 +38,13 @@ public interface UserService {
      * @throws NoSuchEntityException when User is not found
      */
     User getById(long id);
+
+    /**
+     * Gets User by username.
+     *
+     * @param username User username to search
+     * @return founded User
+     * @throws NoSuchEntityException when User is not found
+     */
+    User getByUsername(String username);
 }
