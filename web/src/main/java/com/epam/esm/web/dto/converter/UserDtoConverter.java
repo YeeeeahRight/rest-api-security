@@ -3,6 +3,7 @@ package com.epam.esm.web.dto.converter;
 import com.epam.esm.persistence.model.entity.User;
 import com.epam.esm.web.dto.RoleDto;
 import com.epam.esm.web.dto.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -10,6 +11,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserDtoConverter implements DtoConverter<User, UserDto> {
+
+    private final RoleDtoConverter roleDtoConverter;
+
+    @Autowired
+    public UserDtoConverter(RoleDtoConverter roleDtoConverter) {
+        this.roleDtoConverter = roleDtoConverter;
+    }
 
     @Override
     public User convertToEntity(UserDto dto) {
@@ -35,7 +43,7 @@ public class UserDtoConverter implements DtoConverter<User, UserDto> {
         userDto.setLastName(entity.getLastName());
         userDto.setEmail(entity.getEmail());
         Set<RoleDto> roleDtoSet = entity.getRoles().stream()
-                .map(role -> new RoleDto(role.getName()))
+                .map(roleDtoConverter::convertToDto)
                 .collect(Collectors.toSet());
         userDto.setRoles(roleDtoSet);
 
