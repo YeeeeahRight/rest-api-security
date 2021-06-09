@@ -9,6 +9,8 @@ import com.epam.esm.web.dto.RoleDto;
 import com.epam.esm.web.dto.UserDto;
 import com.epam.esm.web.dto.converter.RoleDtoConverter;
 import com.epam.esm.web.dto.converter.UserDtoConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,10 +62,17 @@ public class AuthenticationController {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
         authenticationManager.authenticate(token);
 
-        String jwt = jwtTokenProvider.createToken(username, user.getRoles());
         Set<RoleDto> roleDtoSet = user.getRoles().stream()
                 .map(roleDtoConverter::convertToDto)
                 .collect(Collectors.toSet());
+        String jwt = jwtTokenProvider.createToken(username, buildMapWithRole(roleDtoSet));
         return new GeneratedJwtDto(username, roleDtoSet, jwt);
     }
+
+    private Map<String, Object> buildMapWithRole(Set<RoleDto> roleDtoSet) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("roles", roleDtoSet);
+        return map;
+    }
+
 }

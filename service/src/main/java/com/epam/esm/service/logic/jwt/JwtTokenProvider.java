@@ -13,9 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -38,10 +36,10 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String username, Set<Role> roles) {
+    public String createToken(String username, Map<String, Object> payloadObjects) {
         Claims claims = Jwts.claims();
         claims.setSubject(username);
-        claims.put("roles", roles.toString());
+        claims.putAll(payloadObjects);
         Date currentTime = new Date();
         Date expirationTime = new Date(currentTime.getTime() + durationTime);
 
@@ -50,6 +48,7 @@ public class JwtTokenProvider {
                 .setIssuedAt(currentTime)
                 .setExpiration(expirationTime)
                 .signWith(SIGNATURE_ALGORITHM, secretKey)
+                .setHeaderParam("typ", "JWT")
                 .compact();
     }
 
@@ -58,7 +57,6 @@ public class JwtTokenProvider {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             Date expirationDate = claimsJws.getBody().getExpiration();
             Date currentDate = new Date();
-
             return !expirationDate.before(currentDate);
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidJwtException("JWT token is expired or invalid");
@@ -71,7 +69,7 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String extractUsernameFromJwt(String token) {
+    private String extractUsernameFromJwt(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 }

@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Locale;
 
 @ControllerAdvice
-public class GlobalExceptionControllerAdviser {
+public class GlobalExceptionControllerHandler {
     private static final List<String> AVAILABLE_LOCALES = Arrays.asList("en_US", "ru_RU");
     private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
 
     private final ResourceBundleMessageSource bundleMessageSource;
 
     @Autowired
-    public GlobalExceptionControllerAdviser(ResourceBundleMessageSource bundleMessageSource) {
+    public GlobalExceptionControllerHandler(ResourceBundleMessageSource bundleMessageSource) {
         this.bundleMessageSource = bundleMessageSource;
     }
 

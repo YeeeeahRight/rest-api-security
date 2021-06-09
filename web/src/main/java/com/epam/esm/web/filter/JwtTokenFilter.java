@@ -4,7 +4,7 @@ import com.epam.esm.service.exception.InvalidJwtException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import com.epam.esm.service.logic.jwt.JwtTokenProvider;
 import com.epam.esm.web.exception.ExceptionResponse;
-import com.epam.esm.web.exception.GlobalExceptionControllerAdviser;
+import com.epam.esm.web.exception.GlobalExceptionControllerHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -25,14 +25,14 @@ public class JwtTokenFilter extends GenericFilterBean {
     private static final String AUTHORIZATION_TYPE_STR = "Bearer";
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final GlobalExceptionControllerAdviser resolver;
+    private final GlobalExceptionControllerHandler resolver;
     private final ServletJsonResponseSender jsonResponseSender;
 
     @Value("${jwt.header}")
     private String authHeader;
 
     @Autowired
-    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider, GlobalExceptionControllerAdviser resolver,
+    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider, GlobalExceptionControllerHandler resolver,
                           ServletJsonResponseSender jsonResponseSender) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.resolver = resolver;
