@@ -7,22 +7,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class SecurityUserDetails implements UserDetails {
-
     private final String username;
     private final String password;
-    private final String firstName;
-    private final String lastName;
-    private final String email;
     private final List<? extends GrantedAuthority> authorities;
     private final boolean isActive;
 
-    public SecurityUserDetails(String username, String password, String firstName, String lastName,
-                               String email, List<? extends GrantedAuthority> authorities, boolean isActive) {
+    public SecurityUserDetails(String username, String password,
+                               List<? extends GrantedAuthority> authorities, boolean isActive) {
         this.username = username;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
         this.authorities = authorities;
         this.isActive = isActive;
     }
@@ -61,17 +54,4 @@ public class SecurityUserDetails implements UserDetails {
     public boolean isEnabled() {
         return isActive;
     }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
 }
