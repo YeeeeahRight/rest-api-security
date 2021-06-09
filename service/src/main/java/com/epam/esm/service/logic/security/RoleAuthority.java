@@ -14,7 +14,7 @@ public enum RoleAuthority {
             Permission.ORDERS_GET, Permission.TAGS_GET, Permission.USERS_GET, Permission.BEST_TAG_GET,
             Permission.CERTIFICATES_GET, Permission.ORDERS_CREATE)),
     ADMIN(permissionSetOf(
-            Permission.ORDERS_GET, Permission.ORDERS_CREATE, Permission.BEST_TAG_GET,
+            Permission.ORDERS_GET,Permission.BEST_TAG_GET,
             Permission.TAGS_GET, Permission.TAGS_CREATE, Permission.TAGS_DELETE,
             Permission.USERS_GET, Permission.CERTIFICATES_GET, Permission.CERTIFICATES_CREATE,
             Permission.CERTIFICATES_UPDATE, Permission.CERTIFICATES_DELETE));
