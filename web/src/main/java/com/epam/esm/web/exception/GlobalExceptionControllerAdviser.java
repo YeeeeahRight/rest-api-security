@@ -17,11 +17,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.lang.reflect.Method;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +44,12 @@ public class GlobalExceptionControllerAdviser {
     public ResponseEntity<ExceptionResponse> handleBadCredentialsException(Locale locale) {
         return buildErrorResponse(resolveResourceBundle("user.bad.creds", locale),
                 40100, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionResponse> handleAccessDeniedException(Locale locale) {
+        return buildErrorResponse(resolveResourceBundle("access.denied", locale),
+                40300, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(DuplicateEntityException.class)
