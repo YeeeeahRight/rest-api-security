@@ -1,5 +1,6 @@
-package com.epam.esm.web.security;
+package com.epam.esm.web.config;
 
+import com.epam.esm.web.filter.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

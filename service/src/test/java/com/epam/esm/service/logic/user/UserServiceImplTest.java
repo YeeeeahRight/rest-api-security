@@ -1,19 +1,26 @@
 package com.epam.esm.service.logic.user;
 
+import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.persistence.model.entity.User;
+import com.epam.esm.persistence.repository.impl.RoleRepositoryImpl;
 import com.epam.esm.persistence.repository.impl.UserRepositoryImpl;
+import com.epam.esm.service.config.ServiceConfig;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,11 +37,19 @@ public class UserServiceImplTest {
     @MockBean
     private UserRepositoryImpl userRepository;
 
+    @MockBean
+    private RoleRepositoryImpl roleRepository;
+
+    @MockBean
+    @Qualifier("bcryptPasswordEncoder")
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserServiceImpl userService;
 
     @Test
     public void testCreateShouldCreate() {
+        when(roleRepository.findByName(anyString())).thenReturn(Optional.of(new Role("USER")));
         userService.create(USER);
         verify(userRepository).create(USER);
     }

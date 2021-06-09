@@ -1,4 +1,4 @@
-package com.epam.esm.service.logic.security;
+package com.epam.esm.service.logic.jwt;
 
 import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.service.exception.InvalidJwtException;

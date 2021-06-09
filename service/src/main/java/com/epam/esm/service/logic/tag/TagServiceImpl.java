@@ -71,6 +71,8 @@ public class TagServiceImpl implements TagService {
         if (!optionalTag.isPresent()) {
             throw new NoSuchEntityException(ExceptionMessageKey.TAG_NOT_FOUND);
         }
+        Tag tag = optionalTag.get();
+        tag.setCertificates(null);
         tagRepository.deleteById(id);
     }
 

@@ -17,8 +17,7 @@ public class Role extends AbstractEntity {
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<User> users;
 
-    public Role(long id, String name) {
-        setId(id);
+    public Role(String name) {
         this.name = name;
     }
 
@@ -59,8 +58,6 @@ public class Role extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Role{" +
-                "name='" + name + '\'' +
-                "} " + super.toString();
+        return name;
     }
 }

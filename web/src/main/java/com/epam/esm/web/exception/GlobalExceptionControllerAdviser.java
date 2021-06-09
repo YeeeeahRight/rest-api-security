@@ -10,6 +10,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,13 +18,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.lang.reflect.Method;
-import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -40,10 +36,16 @@ public class GlobalExceptionControllerAdviser {
         this.bundleMessageSource = bundleMessageSource;
     }
 
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidJwtException(Locale locale) {
+        return buildErrorResponse(resolveResourceBundle("jwt.invalid", locale),
+                40100, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ExceptionResponse> handleBadCredentialsException(Locale locale) {
         return buildErrorResponse(resolveResourceBundle("user.bad.creds", locale),
-                40100, HttpStatus.UNAUTHORIZED);
+                40101, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -79,7 +81,8 @@ public class GlobalExceptionControllerAdviser {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ExceptionResponse> handleNoSuchEntityException(MissingServletRequestParameterException e) {
+    public ResponseEntity<ExceptionResponse> handleMissingServletRequestParameterException
+            (MissingServletRequestParameterException e) {
         return buildErrorResponse(e.getMessage(), 40002, HttpStatus.BAD_REQUEST);
     }
 
@@ -125,16 +128,16 @@ public class GlobalExceptionControllerAdviser {
         return buildErrorResponse(e.getMessage(), 50000, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ResponseEntity<ExceptionResponse> buildErrorResponse(String message, int code,
-                                                                 HttpStatus status) {
-        ExceptionResponse response = new ExceptionResponse(message, code);
-        return new ResponseEntity<>(response, status);
-    }
-
     private String resolveResourceBundle(String key, Locale locale) {
         if (!AVAILABLE_LOCALES.contains(locale.toString())) {
             locale = DEFAULT_LOCALE;
         }
         return bundleMessageSource.getMessage(key, null, locale);
+    }
+
+    private ResponseEntity<ExceptionResponse> buildErrorResponse(String message, int code,
+                                                                 HttpStatus status) {
+        ExceptionResponse response = new ExceptionResponse(message, code);
+        return new ResponseEntity<>(response, status);
     }
 }

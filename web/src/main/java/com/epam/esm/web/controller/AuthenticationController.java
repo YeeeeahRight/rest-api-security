@@ -1,7 +1,7 @@
 package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.service.logic.security.JwtTokenProvider;
+import com.epam.esm.service.logic.jwt.JwtTokenProvider;
 import com.epam.esm.service.logic.user.UserService;
 import com.epam.esm.web.dto.LoginRequestDto;
 import com.epam.esm.web.dto.UserDto;
