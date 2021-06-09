@@ -40,11 +40,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User create(User user) {
-        if (userRepository.findByField("username", user.getUsername()).isPresent()) {
-            throw new DuplicateEntityException(ExceptionMessageKey.USERNAME_EXIST);
-        }
         if (userRepository.findByField("email", user.getEmail()).isPresent()) {
             throw new DuplicateEntityException(ExceptionMessageKey.USER_EMAIL_EXIST);
+        }
+        if (userRepository.findByField("username", user.getUsername()).isPresent()) {
+            throw new DuplicateEntityException(ExceptionMessageKey.USERNAME_EXIST);
         }
         Optional<Role> defaultRoleOptional = roleRepository.findByName(USER_ROLE_NAME);
         if (!defaultRoleOptional.isPresent()) {

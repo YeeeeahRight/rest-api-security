@@ -1,4 +1,4 @@
-package com.epam.esm.web.config;
+package com.epam.esm.web.security;
 
 import com.epam.esm.web.exception.ExceptionResponse;
 import com.epam.esm.web.exception.GlobalExceptionControllerHandler;
@@ -9,13 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,19 +24,23 @@ import java.util.Locale;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenFilter jwtTokenFilter;
     private final ServletJsonResponseSender jsonResponseSender;
     private final GlobalExceptionControllerHandler resolver;
+    private final OauthAuthSuccessHandler oauthAuthSuccessHandler;
 
     @Autowired
-    public SecurityConfig(JwtTokenFilter jwtTokenFilter, ServletJsonResponseSender jsonResponseSender,
-                          GlobalExceptionControllerHandler resolver) {
+    public SecurityConfig(JwtTokenFilter jwtTokenFilter,
+                          ServletJsonResponseSender jsonResponseSender,
+                          GlobalExceptionControllerHandler resolver,
+                          OauthAuthSuccessHandler oauthAuthSuccessHandler) {
         this.jwtTokenFilter = jwtTokenFilter;
         this.jsonResponseSender = jsonResponseSender;
         this.resolver = resolver;
+        this.oauthAuthSuccessHandler = oauthAuthSuccessHandler;
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -57,7 +59,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(
                         (request, response, ex) -> handleNoJwt(request, response)
-                );
+                )
+                .and()
+                .oauth2Login()
+                .successHandler(oauthAuthSuccessHandler::handle);
     }
 
     @Bean

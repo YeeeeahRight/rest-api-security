@@ -1,6 +1,7 @@
 package com.epam.esm.service.logic.user;
 
 import com.epam.esm.persistence.model.entity.User;
+import com.epam.esm.service.exception.DuplicateEntityException;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 
@@ -17,6 +18,7 @@ public interface UserService {
      * @param userDto User to create
      * @return created User
      * @throws NoSuchEntityException when role is not found
+     * @throws DuplicateEntityException when email or username is already exist
      */
     User create(User userDto);
 

@@ -3,22 +3,20 @@ package com.epam.esm.web.controller;
 import com.epam.esm.persistence.model.entity.User;
 import com.epam.esm.service.logic.jwt.JwtTokenProvider;
 import com.epam.esm.service.logic.user.UserService;
-import com.epam.esm.web.dto.GeneratedJwtDto;
-import com.epam.esm.web.dto.LoginRequestDto;
-import com.epam.esm.web.dto.RoleDto;
-import com.epam.esm.web.dto.UserDto;
+import com.epam.esm.web.dto.*;
 import com.epam.esm.web.dto.converter.RoleDtoConverter;
 import com.epam.esm.web.dto.converter.UserDtoConverter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.epam.esm.web.link.LinkAdder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.ResolvableType;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -26,22 +24,30 @@ import java.util.stream.Collectors;
 
 @RestController
 public class AuthenticationController {
+    private static final String OAUTH_BASE_URL = "/oauth2/authorization/";
 
     private final UserService userService;
     private final UserDtoConverter userDtoConverter;
     private final RoleDtoConverter roleDtoConverter;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final LinkAdder<UserDto> userDtoLinkAdder;
 
     @Autowired
     public AuthenticationController(UserService userService, UserDtoConverter userDtoConverter,
-                                    RoleDtoConverter roleDtoConverter, JwtTokenProvider jwtTokenProvider,
-                                    AuthenticationManager authenticationManager) {
+                                    RoleDtoConverter roleDtoConverter,
+                                    JwtTokenProvider jwtTokenProvider,
+                                    AuthenticationManager authenticationManager,
+                                    ClientRegistrationRepository clientRegistrationRepository,
+                                    LinkAdder<UserDto> userDtoLinkAdder) {
         this.userService = userService;
         this.userDtoConverter = userDtoConverter;
         this.roleDtoConverter = roleDtoConverter;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+        this.userDtoLinkAdder = userDtoLinkAdder;
     }
 
     @PostMapping("/signup")
@@ -50,7 +56,9 @@ public class AuthenticationController {
         User user = userDtoConverter.convertToEntity(userDto);
         user = userService.create(user);
 
-        return userDtoConverter.convertToDto(user);
+        userDto =  userDtoConverter.convertToDto(user);
+        userDtoLinkAdder.addLinks(userDto);
+        return userDto;
     }
 
     @PostMapping("/login")
@@ -69,10 +77,29 @@ public class AuthenticationController {
         return new GeneratedJwtDto(username, roleDtoSet, jwt);
     }
 
+    @GetMapping("/oauth/signup")
+    @ResponseStatus(HttpStatus.OK)
+    public OauthSignUpDto getOauthRefs() {
+        Iterable<ClientRegistration> clientRegistrations = null;
+        ResolvableType type = ResolvableType.forInstance(clientRegistrationRepository)
+                .as(Iterable.class);
+        if (type != ResolvableType.NONE &&
+                ClientRegistration.class.isAssignableFrom(type.resolveGenerics()[0])) {
+            clientRegistrations = (Iterable<ClientRegistration>) clientRegistrationRepository;
+        }
+
+        OauthSignUpDto oauthLogin = new OauthSignUpDto();
+        if (clientRegistrations != null) {
+            clientRegistrations.forEach(registration ->
+                    oauthLogin.getRefs().put(registration.getClientName(),
+                            OAUTH_BASE_URL + registration.getRegistrationId()));
+        }
+        return oauthLogin;
+    }
+
     private Map<String, Object> buildMapWithRole(Set<RoleDto> roleDtoSet) {
         Map<String, Object> map = new HashMap<>();
         map.put("roles", roleDtoSet);
         return map;
     }
-
 }
