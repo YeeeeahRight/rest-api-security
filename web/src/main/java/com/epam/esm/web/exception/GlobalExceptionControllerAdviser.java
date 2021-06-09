@@ -1,6 +1,7 @@
 package com.epam.esm.web.exception;
 
 import com.epam.esm.service.exception.DuplicateEntityException;
+import com.epam.esm.service.exception.InvalidJwtException;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import org.springframework.beans.TypeMismatchException;
@@ -9,6 +10,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,6 +36,12 @@ public class GlobalExceptionControllerAdviser {
     @Autowired
     public GlobalExceptionControllerAdviser(ResourceBundleMessageSource bundleMessageSource) {
         this.bundleMessageSource = bundleMessageSource;
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponse> handleBadCredentialsException(Locale locale) {
+        return buildErrorResponse(resolveResourceBundle("user.bad.creds", locale),
+                40100, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(DuplicateEntityException.class)
