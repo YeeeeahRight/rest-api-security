@@ -42,10 +42,14 @@ public class GlobalExceptionControllerAdviser {
                 40100, HttpStatus.UNAUTHORIZED);
     }
 
+    public ExceptionResponse buildNoJwtResponseObject(Locale locale) {
+        return new ExceptionResponse(resolveResourceBundle("jwt.not.exist", locale), 40101);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ExceptionResponse> handleBadCredentialsException(Locale locale) {
         return buildErrorResponse(resolveResourceBundle("user.bad.creds", locale),
-                40101, HttpStatus.UNAUTHORIZED);
+                40102, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
