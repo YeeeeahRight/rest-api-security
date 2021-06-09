@@ -17,6 +17,7 @@ import java.io.IOException;
 
 @Component
 public class JwtTokenFilter extends GenericFilterBean {
+    private static final String AUTHORIZATION_TYPE_STR = "Bearer";
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -31,7 +32,7 @@ public class JwtTokenFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-        String token = ((HttpServletRequest) servletRequest).getHeader(authHeader);
+        String token = resolveToken((HttpServletRequest) servletRequest);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
@@ -41,5 +42,13 @@ public class JwtTokenFilter extends GenericFilterBean {
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    public String resolveToken(HttpServletRequest req) {
+        String authToken = req.getHeader(authHeader);
+        if (authToken != null && authToken.startsWith(AUTHORIZATION_TYPE_STR)) {
+            return authToken.substring(AUTHORIZATION_TYPE_STR.length() + 1);
+        }
+        return null;
     }
 }
