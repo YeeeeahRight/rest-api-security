@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder, UserRepository userRepository,
-                           RoleRepository roleRepository) {
+    public UserServiceImpl(@Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder,
+                           UserRepository userRepository, RoleRepository roleRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -85,5 +85,23 @@ public class UserServiceImpl implements UserService {
             throw new NoSuchEntityException(ExceptionMessageKey.USER_NOT_FOUND);
         }
         return userOptional.get();
+    }
+
+    @Override
+    @Transactional
+    public User changePassword(String username, String currentPassword, String newPassword) {
+        Optional<User> userOptional = userRepository.findByField("username", username);
+        if (!userOptional.isPresent()) {
+            throw new NoSuchEntityException(ExceptionMessageKey.USER_NOT_FOUND);
+        }
+        User user = userOptional.get();
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new InvalidParametersException(ExceptionMessageKey.PASSWORDS_NOT_MATCH);
+        }
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.update(user);
+
+        return user;
     }
 }

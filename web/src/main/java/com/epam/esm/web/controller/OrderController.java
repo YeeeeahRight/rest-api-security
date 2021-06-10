@@ -2,7 +2,7 @@ package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.entity.Order;
 import com.epam.esm.service.logic.order.OrderService;
-import com.epam.esm.web.dto.OrderDto;
+import com.epam.esm.web.dto.entity.OrderDto;
 import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.link.LinkAdder;
 import org.springframework.http.HttpStatus;

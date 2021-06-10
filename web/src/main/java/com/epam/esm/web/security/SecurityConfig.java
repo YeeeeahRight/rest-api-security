@@ -28,13 +28,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenFilter jwtTokenFilter;
     private final ServletJsonResponseSender jsonResponseSender;
     private final GlobalExceptionControllerHandler resolver;
-    private final OauthAuthSuccessHandler oauthAuthSuccessHandler;
+    private final OAuthAuthSuccessHandler oauthAuthSuccessHandler;
 
     @Autowired
     public SecurityConfig(JwtTokenFilter jwtTokenFilter,
                           ServletJsonResponseSender jsonResponseSender,
                           GlobalExceptionControllerHandler resolver,
-                          OauthAuthSuccessHandler oauthAuthSuccessHandler) {
+                          OAuthAuthSuccessHandler oauthAuthSuccessHandler) {
         this.jwtTokenFilter = jwtTokenFilter;
         this.jsonResponseSender = jsonResponseSender;
         this.resolver = resolver;
@@ -47,11 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/**").permitAll()
-                .antMatchers("/login", "/signup").permitAll()
+                .antMatchers(HttpMethod.GET, "/users/**", "/tags/**", "/certificates/**").permitAll()
+                .antMatchers("/login", "/signup", "/oauth/signup").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -62,7 +60,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .and()
                 .oauth2Login()
-                .successHandler(oauthAuthSuccessHandler::handle);
+                .successHandler(oauthAuthSuccessHandler::handle)
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean

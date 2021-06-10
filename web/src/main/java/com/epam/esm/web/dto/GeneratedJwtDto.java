@@ -1,8 +1,11 @@
 package com.epam.esm.web.dto;
 
+import com.epam.esm.web.dto.entity.RoleDto;
+import org.springframework.hateoas.RepresentationModel;
+
 import java.util.Set;
 
-public class GeneratedJwtDto {
+public class GeneratedJwtDto extends RepresentationModel<GeneratedJwtDto> {
     private String username;
     private Set<RoleDto> roles;
     private String jwt;

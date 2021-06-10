@@ -3,9 +3,9 @@ package com.epam.esm.web.dto.converter;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Order;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.web.dto.GiftCertificateDto;
-import com.epam.esm.web.dto.OrderDto;
-import com.epam.esm.web.dto.UserDto;
+import com.epam.esm.web.dto.entity.GiftCertificateDto;
+import com.epam.esm.web.dto.entity.OrderDto;
+import com.epam.esm.web.dto.entity.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

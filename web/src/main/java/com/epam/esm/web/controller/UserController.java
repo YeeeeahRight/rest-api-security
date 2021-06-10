@@ -1,21 +1,16 @@
 package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.BestUserTag;
-import com.epam.esm.persistence.model.entity.Order;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.web.dto.OrderDto;
-import com.epam.esm.web.dto.UserDto;
-import com.epam.esm.service.logic.order.OrderService;
+import com.epam.esm.web.dto.entity.UserDto;
 import com.epam.esm.service.logic.tag.TagService;
 import com.epam.esm.service.logic.user.UserService;
 import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.link.LinkAdder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 

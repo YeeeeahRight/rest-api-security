@@ -17,4 +17,6 @@ public final class ExceptionMessageKey {
 
     public static final String INVALID_PAGINATION = "pagination.invalid";
     public static final String SORT_PARAMS_INVALID = "sort.params.invalid";
+
+    public static final String PASSWORDS_NOT_MATCH = "passwords.not.match";
 }

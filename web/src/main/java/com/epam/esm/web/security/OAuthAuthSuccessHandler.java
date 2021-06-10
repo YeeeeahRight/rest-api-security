@@ -4,7 +4,7 @@ import com.epam.esm.persistence.model.entity.User;
 import com.epam.esm.service.exception.DuplicateEntityException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import com.epam.esm.service.logic.user.UserService;
-import com.epam.esm.web.dto.UserDto;
+import com.epam.esm.web.dto.entity.UserDto;
 import com.epam.esm.web.dto.converter.UserDtoConverter;
 import com.epam.esm.web.exception.ExceptionResponse;
 import com.epam.esm.web.exception.GlobalExceptionControllerHandler;
@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
-public class OauthAuthSuccessHandler {
+public class OAuthAuthSuccessHandler {
     private final UserService userService;
     private final UserDtoConverter userDtoConverter;
     private final ServletJsonResponseSender jsonResponseSender;
@@ -31,7 +31,7 @@ public class OauthAuthSuccessHandler {
     private final LinkAdder<UserDto> userDtoLinkAdder;
 
     @Autowired
-    public OauthAuthSuccessHandler(UserService userService, UserDtoConverter userDtoConverter,
+    public OAuthAuthSuccessHandler(UserService userService, UserDtoConverter userDtoConverter,
                                    ServletJsonResponseSender jsonResponseSender,
                                    GlobalExceptionControllerHandler resolver,
                                    LinkAdder<UserDto> userDtoLinkAdder) {

@@ -1,7 +1,7 @@
 package com.epam.esm.web.dto.converter;
 
 import com.epam.esm.persistence.model.entity.Role;
-import com.epam.esm.web.dto.RoleDto;
+import com.epam.esm.web.dto.entity.RoleDto;
 import org.springframework.stereotype.Component;
 
 @Component

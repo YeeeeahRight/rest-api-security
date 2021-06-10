@@ -1,9 +1,10 @@
 package com.epam.esm.web.link;
 
 import com.epam.esm.web.controller.UserController;
-import com.epam.esm.web.dto.GiftCertificateDto;
-import com.epam.esm.web.dto.OrderDto;
-import com.epam.esm.web.dto.UserDto;
+import com.epam.esm.web.dto.entity.GiftCertificateDto;
+import com.epam.esm.web.dto.entity.OrderDto;
+import com.epam.esm.web.dto.entity.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -15,6 +16,7 @@ public class OrderLinkAdder extends AbstractLinkAdder<OrderDto> {
     private final LinkAdder<UserDto> userDtoLinkAdder;
     private final LinkAdder<GiftCertificateDto> certificateDtoLinkAdder;
 
+    @Autowired
     public OrderLinkAdder(LinkAdder<UserDto> userDtoLinkAdder,
                           LinkAdder<GiftCertificateDto> certificateDtoLinkAdder) {
         this.userDtoLinkAdder = userDtoLinkAdder;

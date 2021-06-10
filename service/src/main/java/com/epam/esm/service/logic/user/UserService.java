@@ -49,4 +49,16 @@ public interface UserService {
      * @throws NoSuchEntityException when User is not found
      */
     User getByUsername(String username);
+
+    /**
+     * Changes User password by id.
+     *
+     * @param username User's username to search
+     * @param currentPassword current user password
+     * @param newPassword new password for change
+     * @return new User data
+     * @throws NoSuchEntityException when User is not found
+     * @throws InvalidParametersException when DB password dont match with entered password
+     */
+    User changePassword(String username, String currentPassword, String newPassword);
 }

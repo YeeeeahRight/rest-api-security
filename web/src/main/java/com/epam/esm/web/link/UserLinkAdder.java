@@ -1,7 +1,7 @@
 package com.epam.esm.web.link;
 
 import com.epam.esm.web.controller.UserController;
-import com.epam.esm.web.dto.UserDto;
+import com.epam.esm.web.dto.entity.UserDto;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;

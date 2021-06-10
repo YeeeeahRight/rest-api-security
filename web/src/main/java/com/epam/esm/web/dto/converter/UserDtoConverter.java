@@ -1,8 +1,8 @@
 package com.epam.esm.web.dto.converter;
 
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.web.dto.RoleDto;
-import com.epam.esm.web.dto.UserDto;
+import com.epam.esm.web.dto.entity.RoleDto;
+import com.epam.esm.web.dto.entity.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

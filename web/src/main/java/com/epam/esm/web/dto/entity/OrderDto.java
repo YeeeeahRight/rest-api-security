@@ -1,4 +1,4 @@
-package com.epam.esm.web.dto;
+package com.epam.esm.web.dto.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;

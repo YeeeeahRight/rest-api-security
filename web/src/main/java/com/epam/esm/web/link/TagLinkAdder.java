@@ -1,7 +1,7 @@
 package com.epam.esm.web.link;
 
 import com.epam.esm.web.controller.TagController;
-import com.epam.esm.web.dto.TagDto;
+import com.epam.esm.web.dto.entity.TagDto;
 import org.springframework.stereotype.Component;
 
 @Component

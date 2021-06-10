@@ -1,13 +1,15 @@
 package com.epam.esm.web.dto;
 
 
+import org.springframework.hateoas.RepresentationModel;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class OauthSignUpDto {
+public class OAuthSignUpDto {
     private Map<String, String> refs = new HashMap<>();
 
-    public OauthSignUpDto() {
+    public OAuthSignUpDto() {
     }
 
     public Map<String, String> getRefs() {

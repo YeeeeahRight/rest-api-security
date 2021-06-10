@@ -13,7 +13,8 @@ public enum Permission {
     ORDERS_GET("orders:get"),
     ORDERS_CREATE("orders:create"),
     SIGNUP("signup"),
-    LOGIN("login");
+    LOGIN("login"),
+    CHANGE_PASSWORD("change-password");
 
     private final String permission;
 

@@ -1,9 +1,9 @@
 package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.entity.GiftCertificate;
-import com.epam.esm.web.dto.GiftCertificateDto;
+import com.epam.esm.web.dto.entity.GiftCertificateDto;
 import com.epam.esm.service.logic.certificate.GiftCertificateService;
-import com.epam.esm.web.dto.TagDto;
+import com.epam.esm.web.dto.entity.TagDto;
 import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.exception.InvalidUpdateFieldsException;
 import com.epam.esm.web.link.LinkAdder;

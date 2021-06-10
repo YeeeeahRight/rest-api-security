@@ -1,7 +1,7 @@
 package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.entity.Tag;
-import com.epam.esm.web.dto.TagDto;
+import com.epam.esm.web.dto.entity.TagDto;
 import com.epam.esm.service.logic.tag.TagService;
 import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.link.LinkAdder;
