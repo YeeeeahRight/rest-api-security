@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,7 +64,7 @@ public class AuthenticationController {
         User user = userDtoConverter.convertToEntity(userDto);
         user = userService.create(user);
 
-        userDto =  userDtoConverter.convertToDto(user);
+        userDto = userDtoConverter.convertToDto(user);
         userDtoLinkAdder.addLinks(userDto);
         return userDto;
     }
@@ -74,13 +75,15 @@ public class AuthenticationController {
         String username = loginDto.getUsername();
         User user = userService.getByUsername(username);
         String password = loginDto.getPassword();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-        authenticationManager.authenticate(token);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(username, password);
+        authenticationManager.authenticate(authenticationToken);
 
         Set<RoleDto> roleDtoSet = user.getRoles().stream()
                 .map(roleDtoConverter::convertToDto)
                 .collect(Collectors.toSet());
-        Map<String, Object> payloadObjects = Collections.singletonMap("roles", roleDtoSet);
+        Map<String, Object> payloadObjects = new HashMap<>();
+        payloadObjects.put("roles", roleDtoSet);
         String jwt = jwtTokenProvider.createToken(username, payloadObjects);
         GeneratedJwtDto generatedJwtDto = new GeneratedJwtDto(username, roleDtoSet, jwt);
         jwtDtoLinkAdder.addLinks(generatedJwtDto);
@@ -114,5 +117,13 @@ public class AuthenticationController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         userService.changePassword(username, changePasswordDto.getCurrentPassword(),
                 changePasswordDto.getNewPassword());
+    }
+
+    @GetMapping("jwt-public-key")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> getJwtPublicKey() {
+        String publicKeyBase64 = jwtTokenProvider.getPublicKey();
+
+        return Collections.singletonMap("key", publicKeyBase64);
     }
 }
