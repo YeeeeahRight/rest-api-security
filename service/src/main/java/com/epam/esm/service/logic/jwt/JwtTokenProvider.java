@@ -1,6 +1,5 @@
 package com.epam.esm.service.logic.jwt;
 
-import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.service.exception.InvalidJwtException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,8 @@ import java.util.*;
 @Component
 public class JwtTokenProvider {
     private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
+
+    //RS256
 
     @Value("${jwt.secret}")
     private String secretKey;

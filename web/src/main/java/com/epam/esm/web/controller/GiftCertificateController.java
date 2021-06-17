@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,8 +67,8 @@ public class GiftCertificateController {
     @GetMapping("/with_tags")
     @ResponseStatus(HttpStatus.OK)
     public List<GiftCertificateDto> getAllWithTags(
-            @RequestParam(name = "tag_name", required = false) List<String> tagNames,
-            @RequestParam(name = "part_info", required = false) String partInfo,
+            @RequestParam(name = "tag_name", defaultValue = "[]", required = false) List<String> tagNames,
+            @RequestParam(name = "part_info", defaultValue = "", required = false) String partInfo,
             @RequestParam(name = "sort", required = false) List<String> sortColumns,
             @RequestParam(name = "order", required = false) List<String> orderTypes,
             @RequestParam(value = "page", defaultValue = "0", required = false) int page,
@@ -75,7 +76,7 @@ public class GiftCertificateController {
         List<GiftCertificate> certificates = giftCertificateService.getAllWithTagsWithFilteringSorting(
                 tagNames, partInfo, sortColumns, orderTypes, page, size);
 
-        return  certificates.stream()
+        return certificates.stream()
                 .map(certificateDtoConverter::convertToDto)
                 .peek(certificateDtoLinkAdder::addLinks)
                 .collect(Collectors.toList());
@@ -90,7 +91,7 @@ public class GiftCertificateController {
         certificateDtoLinkAdder.addLinks(certificateDto);
         return certificateDto;
     }
-    
+
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('certificates:update')")

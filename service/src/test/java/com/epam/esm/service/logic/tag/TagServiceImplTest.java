@@ -2,13 +2,12 @@ package com.epam.esm.service.logic.tag;
 
 import static org.mockito.Mockito.*;
 
-import com.epam.esm.persistence.repository.UserRepository;
-import com.epam.esm.persistence.repository.impl.TagRepositoryImpl;
 import com.epam.esm.persistence.model.entity.Tag;
+import com.epam.esm.persistence.repository.data.TagRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.DuplicateEntityException;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
-import com.epam.esm.service.logic.tag.TagServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class TagServiceImplTest {
     private static final int DEFAULT_PAGE_SIZE = 50;
 
     @MockBean
-    private TagRepositoryImpl tagDao;
+    private TagRepository tagRepository;
 
     @MockBean
     private UserRepository userRepository;
@@ -39,21 +38,21 @@ public class TagServiceImplTest {
 
     @Test
     public void testCreateShouldCreateWhenNotExist() {
-        when(tagDao.findByName(NAME)).thenReturn(Optional.empty());
+        when(tagRepository.findByName(NAME)).thenReturn(Optional.empty());
         tagService.create(TAG);
-        verify(tagDao).create(TAG);
+        verify(tagRepository).save(TAG);
     }
 
     @Test(expected = DuplicateEntityException.class)
     public void testCreateShouldThrowsDuplicateEntityExceptionWhenExist() {
-        when(tagDao.findByName(NAME)).thenReturn(Optional.of(TAG));
+        when(tagRepository.findByName(NAME)).thenReturn(Optional.of(TAG));
         tagService.create(TAG);
     }
 
     @Test
     public void testGetAllShouldGetAll() {
         tagService.getAll(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(tagDao).getAll(any());
+        verify(tagRepository).findAll();
     }
 
     @Test(expected = InvalidParametersException.class)
@@ -63,39 +62,39 @@ public class TagServiceImplTest {
 
     @Test
     public void testGetByIdShouldGetWhenFound() {
-        when(tagDao.findById(ID)).thenReturn(Optional.of(TAG));
+        when(tagRepository.findById(ID)).thenReturn(Optional.of(TAG));
         tagService.getById(ID);
-        verify(tagDao).findById(ID);
+        verify(tagRepository).findById(ID);
     }
 
     @Test(expected = NoSuchEntityException.class)
     public void testGetByIdShouldThrowsNoSuchEntityExceptionWhenNotFound() {
-        when(tagDao.findById(ID)).thenReturn(Optional.empty());
+        when(tagRepository.findById(ID)).thenReturn(Optional.empty());
         tagService.getById(ID);
     }
 
     @Test
     public void testDeleteByIdShouldDeleteWhenFound() {
-        when(tagDao.findById(ID)).thenReturn(Optional.of(TAG));
+        when(tagRepository.findById(ID)).thenReturn(Optional.of(TAG));
         tagService.deleteById(ID);
-        verify(tagDao).deleteById(ID);
+        verify(tagRepository).deleteById(ID);
     }
 
     @Test(expected = NoSuchEntityException.class)
     public void testDeleteByIdShouldThrowsNoSuchEntityExceptionWhenNotFound() {
-        when(tagDao.findById(ID)).thenReturn(Optional.empty());
+        when(tagRepository.findById(ID)).thenReturn(Optional.empty());
         tagService.deleteById(ID);
     }
 
     public void testGetUserMostWidelyUsedTagWithHighestOrderCostShouldGetWhenFound() {
-        when(tagDao.findById(ID)).thenReturn(Optional.of(TAG));
+        when(tagRepository.findById(ID)).thenReturn(Optional.of(TAG));
         tagService.getUserMostWidelyUsedTagWithHighestOrderCost(ID);
-        verify(tagDao).findUserMostWidelyUsedTagWithHighestOrderCost(eq(ID));
+        verify(tagRepository).findUserMostWidelyUsedTagWithHighestOrderCost(eq(ID));
     }
 
     @Test(expected = NoSuchEntityException.class)
     public void testGetUserMostWidelyUsedTagWithHighestOrderCostShouldThrowsWhenNotFound() {
-        when(tagDao.findById(ID)).thenReturn(Optional.of(TAG));
+        when(tagRepository.findById(ID)).thenReturn(Optional.of(TAG));
         tagService.getUserMostWidelyUsedTagWithHighestOrderCost(ID);
     }
 }

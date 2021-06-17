@@ -1,14 +1,17 @@
-package com.epam.esm.persistence.repository;
+package com.epam.esm.persistence.repository.data;
 
 import com.epam.esm.persistence.model.entity.Order;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Repository interface for Order
  */
-public interface OrderRepository extends EntityRepository<Order> {
+@Repository
+public interface OrderRepository extends PagingAndSortingRepository<Order, Long> {
 
     /**
      * Gets all Orders by User id
@@ -17,5 +20,5 @@ public interface OrderRepository extends EntityRepository<Order> {
      * @param pageable object with pagination info(page number, page size)
      * @return founded orders
      */
-    List<Order> getAllByUserId(long userId, Pageable pageable);
+    List<Order> findAllByUserId(long userId, Pageable pageable);
 }

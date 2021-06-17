@@ -2,8 +2,8 @@ package com.epam.esm.service.logic.user;
 
 import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.RoleRepository;
-import com.epam.esm.persistence.repository.UserRepository;
+import com.epam.esm.persistence.repository.data.RoleRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.DuplicateEntityException;
 import com.epam.esm.service.exception.ExceptionMessageKey;
 import com.epam.esm.service.exception.InvalidParametersException;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,10 +39,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User create(User user) {
-        if (userRepository.findByField("email", user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new DuplicateEntityException(ExceptionMessageKey.USER_EMAIL_EXIST);
         }
-        if (userRepository.findByField("username", user.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new DuplicateEntityException(ExceptionMessageKey.USERNAME_EXIST);
         }
         Optional<Role> defaultRoleOptional = roleRepository.findByName(USER_ROLE_NAME);
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
         user.setRoles(Collections.singleton(defaultRole));
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        return userRepository.create(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
 
-        return userRepository.getAll(pageRequest);
+        return userRepository.findAll(pageRequest).getContent();
     }
 
     @Override
@@ -80,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByUsername(String username) {
-        Optional<User> userOptional = userRepository.findByField("username", username);
+        Optional<User> userOptional = userRepository.findByUsername(username);
         if (!userOptional.isPresent()) {
             throw new NoSuchEntityException(ExceptionMessageKey.USER_NOT_FOUND);
         }
@@ -90,7 +89,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User changePassword(String username, String currentPassword, String newPassword) {
-        Optional<User> userOptional = userRepository.findByField("username", username);
+        Optional<User> userOptional = userRepository.findByUsername(username);
         if (!userOptional.isPresent()) {
             throw new NoSuchEntityException(ExceptionMessageKey.USER_NOT_FOUND);
         }
@@ -100,7 +99,7 @@ public class UserServiceImpl implements UserService {
         }
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);
-        userRepository.update(user);
+        userRepository.save(user);
 
         return user;
     }

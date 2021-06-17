@@ -3,7 +3,7 @@
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
     http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
 
-    <sql-result-set-mapping name="BestTagMapping">
+    <sql-result-set-mapping name="bestTagMapping">
         <constructor-result target-class="com.epam.esm.persistence.model.BestUserTag">
             <column name="id" class="java.lang.Long"/>
             <column name="tagName" class="java.lang.String"/>
