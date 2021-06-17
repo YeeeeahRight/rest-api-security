@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/users/**", "/tags/**", "/certificates/**").permitAll()
-                .antMatchers("/login", "/signup", "/oauth/signup").permitAll()
+                .antMatchers("/login", "/signup", "/oauth/signup", "/jwt-public-key").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

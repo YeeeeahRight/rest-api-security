@@ -12,6 +12,6 @@ public class GeneratedJwtDtoLinkAdder extends AbstractLinkAdder<GeneratedJwtDto>
 
     @Override
     public void addLinks(GeneratedJwtDto entity) {
-        entity.add(linkTo(CONTROLLER).slash("change-password").withRel("change_pass"));
+        entity.add(linkTo(CONTROLLER).slash("change-password").withRel("changePassword"));
     }
 }
