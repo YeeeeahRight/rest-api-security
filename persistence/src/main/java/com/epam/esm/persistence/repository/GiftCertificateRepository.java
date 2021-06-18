@@ -17,9 +17,7 @@ public interface GiftCertificateRepository
     /**
      * Gets all Certificates with sorting and filtering by part info of description or name.
      *
-     * @param tagNames Tag names to filter
      * @param partInfo part info of name/description of Certificate to filter
-     * @param sort     sort parameters
      * @param pageable object with pagination info(page number, page size)
      * @return List of filtered and sorted Certificates
      */
@@ -30,11 +28,10 @@ public interface GiftCertificateRepository
     List<GiftCertificate> findAllByPartInfo(String partInfo, Pageable pageable);
 
     /**
-     * Gets all Certificates with sorting and filtering.
+     * Gets all Certificates with sorting and filtering by id, part info of description or name.
      *
-     * @param tagNames Tag names to filter
+     * @param certificateIds Certificate ids to filter
      * @param partInfo part info of name/description of Certificate to filter
-     * @param sort     sort parameters
      * @param pageable object with pagination info(page number, page size)
      * @return List of filtered and sorted Certificates
      */
