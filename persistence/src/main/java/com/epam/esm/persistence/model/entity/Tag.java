@@ -1,12 +1,18 @@
 package com.epam.esm.persistence.model.entity;
 
 import com.epam.esm.persistence.audit.EntityAuditListener;
+import com.epam.esm.persistence.query.NativeQuery;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedNativeQuery(
+        name = "findUserMostWidelyUsedTagWithHighestOrderCost",
+        query = NativeQuery.MOST_WIDELY_USED_WITH_HIGHEST_ORDER_COST_TAG_QUERY,
+        resultSetMapping = "bestTagMapping"
+)
 @EntityListeners(EntityAuditListener.class)
 @Table(name = "tags")
 public class Tag extends AbstractEntity{

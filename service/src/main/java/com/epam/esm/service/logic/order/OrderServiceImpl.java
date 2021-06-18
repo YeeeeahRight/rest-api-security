@@ -3,9 +3,9 @@ package com.epam.esm.service.logic.order;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Order;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.GiftCertificateRepository;
-import com.epam.esm.persistence.repository.OrderRepository;
-import com.epam.esm.persistence.repository.UserRepository;
+import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.data.OrderRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.ExceptionMessageKey;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -52,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCertificate(certificate);
         order.setCost(certificate.getPrice());
 
-        return orderRepository.create(order);
+        return orderRepository.save(order);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
 
-        return orderRepository.getAllByUserId(userId, pageRequest);
+        return orderRepository.findAllByUserId(userId, pageRequest);
     }
 
     @Override

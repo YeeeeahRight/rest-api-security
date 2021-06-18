@@ -2,9 +2,8 @@ package com.epam.esm.service.logic.user;
 
 import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.impl.RoleRepositoryImpl;
-import com.epam.esm.persistence.repository.impl.UserRepositoryImpl;
-import com.epam.esm.service.config.ServiceConfig;
+import com.epam.esm.persistence.repository.data.RoleRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import org.junit.Test;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -35,10 +33,10 @@ public class UserServiceImplTest {
     private static final int DEFAULT_PAGE_SIZE = 50;
 
     @MockBean
-    private UserRepositoryImpl userRepository;
+    private UserRepository userRepository;
 
     @MockBean
-    private RoleRepositoryImpl roleRepository;
+    private RoleRepository roleRepository;
 
     @MockBean
     @Qualifier("bcryptPasswordEncoder")
@@ -51,13 +49,13 @@ public class UserServiceImplTest {
     public void testCreateShouldCreate() {
         when(roleRepository.findByName(anyString())).thenReturn(Optional.of(new Role("USER")));
         userService.create(USER);
-        verify(userRepository).create(USER);
+        verify(userRepository).save(USER);
     }
 
     @Test
     public void testGetAllShouldGetAll() {
         userService.getAll(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(userRepository).getAll(any());
+        verify(userRepository).findAll();
     }
 
     @Test(expected = InvalidParametersException.class)

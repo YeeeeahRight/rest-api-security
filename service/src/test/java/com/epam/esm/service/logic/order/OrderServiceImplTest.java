@@ -3,28 +3,20 @@ package com.epam.esm.service.logic.order;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Order;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.GiftCertificateRepository;
-import com.epam.esm.persistence.repository.OrderRepository;
-import com.epam.esm.persistence.repository.UserRepository;
-import com.epam.esm.persistence.repository.impl.GiftCertificateRepositoryImpl;
-import com.epam.esm.persistence.repository.impl.OrderRepositoryImpl;
-import com.epam.esm.persistence.repository.impl.UserRepositoryImpl;
-import com.epam.esm.service.exception.DuplicateEntityException;
+import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.data.OrderRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
-import com.epam.esm.service.logic.user.UserServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.awt.print.Pageable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -51,11 +43,11 @@ public class OrderServiceImplTest {
     private static final int DEFAULT_PAGE_SIZE = 50;
 
     @MockBean
-    private OrderRepositoryImpl orderRepository;
+    private OrderRepository orderRepository;
     @MockBean
-    private GiftCertificateRepositoryImpl certificateRepository;
+    private GiftCertificateRepository certificateRepository;
     @MockBean
-    private UserRepositoryImpl userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private OrderServiceImpl orderService;
@@ -65,7 +57,7 @@ public class OrderServiceImplTest {
         when(userRepository.findById(ID)).thenReturn(Optional.of(USER));
         when(certificateRepository.findById(ID)).thenReturn(Optional.of(GIFT_CERTIFICATE));
         orderService.create(ID, ID);
-        verify(orderRepository).create(any());
+        verify(orderRepository).save(any());
     }
 
     @Test(expected = NoSuchEntityException.class)
@@ -84,7 +76,7 @@ public class OrderServiceImplTest {
     public void testGetAllByUserIdIdShouldGetAll() {
         when(userRepository.findById(ID)).thenReturn(Optional.of(USER));
         orderService.getAllByUserId(ID, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(orderRepository).getAllByUserId(eq(ID), any());
+        verify(orderRepository).findAllByUserId(eq(ID), any());
     }
 
     @Test(expected = InvalidParametersException.class)

@@ -1,33 +1,44 @@
 package com.epam.esm.service.logic.certificate;
 
-import com.epam.esm.persistence.repository.GiftCertificateRepository;
-import com.epam.esm.persistence.repository.TagRepository;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Tag;
+import com.epam.esm.persistence.model.entity.User;
+import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.data.OrderRepository;
+import com.epam.esm.persistence.repository.data.TagRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.*;
 import com.epam.esm.persistence.model.SortParamsContext;
 import com.epam.esm.service.validator.SortParamsContextValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository certificateRepository;
     private final TagRepository tagRepository;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
     private final SortParamsContextValidator sortParametersValidator;
 
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateRepository certificateRepository,
                                       TagRepository tagRepository,
+                                      OrderRepository orderRepository,
+                                      UserRepository userRepository,
                                       SortParamsContextValidator sortParametersValidator) {
         this.certificateRepository = certificateRepository;
         this.tagRepository = tagRepository;
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
         this.sortParametersValidator = sortParametersValidator;
     }
 
@@ -46,7 +57,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             }
         }
         giftCertificate.setTags(tagsToPersist);
-        return certificateRepository.create(giftCertificate);
+        return certificateRepository.save(giftCertificate);
     }
 
     @Override
@@ -58,7 +69,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
 
-        List<GiftCertificate> giftCertificates = certificateRepository.getAll(pageRequest);
+        List<GiftCertificate> giftCertificates = certificateRepository
+                .findAll(pageRequest).getContent();
         giftCertificates.forEach(giftCertificate -> giftCertificate.setTags(null));
         return giftCertificates;
     }
@@ -76,18 +88,38 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public List<GiftCertificate> getAllWithTagsWithFilteringSorting(List<String> tagNames, String partInfo,
                                                                     List<String> sortColumns, List<String> orderTypes,
                                                                     int page, int size) {
+        Sort sort = Sort.unsorted();
+        if (sortColumns != null) {
+            SortParamsContext sortParameters = new SortParamsContext(sortColumns, orderTypes);
+            validateSortParams(sortParameters);
+
+            List<String> orderTypesList = sortParameters.getOrderTypes();
+            for (int i = 0; i < sortParameters.getSortColumns().size(); i++) {
+                String sortColumn = sortParameters.getSortColumns().get(i);
+                Sort newSort = Sort.by(sortColumn);
+                if (orderTypesList.size() <= i
+                        || orderTypesList.get(i).equalsIgnoreCase("asc")) {
+                    newSort.ascending();
+                } else {
+                    newSort.descending();
+                }
+                sort.and(newSort);
+            }
+        }
         Pageable pageRequest;
         try {
-            pageRequest = PageRequest.of(page, size);
+            pageRequest = PageRequest.of(page, size, sort);
         } catch (IllegalArgumentException e) {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
-        SortParamsContext sortParameters = null;
-        if (sortColumns != null) {
-            sortParameters = new SortParamsContext(sortColumns, orderTypes);
-            validateSortParams(sortParameters);
+
+        partInfo = "%" + partInfo + "%";
+        if (tagNames == null || tagNames.isEmpty()) {
+            return certificateRepository.findAllByPartInfo(partInfo, pageRequest);
         }
-        return certificateRepository.getAllWithSortingFiltering(sortParameters, tagNames, partInfo, pageRequest);
+        Set<Long> certificateIds = findIdsByTagName(tagNames);
+        return certificateRepository.findAllByIdsAndPartInfo(
+                certificateIds, partInfo, pageRequest);
     }
 
     @Override
@@ -104,7 +136,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             Set<Tag> tags = giftCertificate.getTags();
             sourceCertificate.setTags(saveTags(tags));
         }
-        return certificateRepository.update(sourceCertificate);
+        return certificateRepository.save(sourceCertificate);
     }
 
     @Override
@@ -114,6 +146,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (!certificateOptional.isPresent()) {
             throw new NoSuchEntityException(ExceptionMessageKey.CERTIFICATE_NOT_FOUND);
         }
+        GiftCertificate giftCertificate = certificateOptional.get();
+        for (Tag tag : giftCertificate.getTags()) {
+            tag.getCertificates().remove(giftCertificate);
+        }
+        orderRepository.findAllByCertificateId(id).forEach(order -> {
+            Optional<User> userOptional = userRepository.findById(order.getId());
+            userOptional.ifPresent(user -> user.getOrders().remove(order));
+            orderRepository.deleteById(order.getId());
+        });
         certificateRepository.deleteById(id);
     }
 
@@ -141,7 +182,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Set<Tag> savedTags = new HashSet<>();
         for (Tag tag : tags) {
             Optional<Tag> optionalTag = tagRepository.findByName(tag.getName());
-            Tag savedTag = optionalTag.orElseGet(() -> tagRepository.create(tag));
+            Tag savedTag = optionalTag.orElseGet(() -> tagRepository.save(tag));
             savedTags.add(savedTag);
         }
         return savedTags;
@@ -153,4 +194,29 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
     }
 
+    private Set<Long> findIdsByTagName(List<String> tagNames) {
+        Map<Long, Integer> certificateIdsAmount = new HashMap<>();
+        for (String name : tagNames) {
+            Optional<Tag> optionalTag = tagRepository.findByName(name);
+            if (optionalTag.isPresent()) {
+                Tag tag = optionalTag.get();
+                for (GiftCertificate certificate : tag.getCertificates()) {
+                    Integer currentAmount = certificateIdsAmount.get(certificate.getId());
+                    if (currentAmount == null) {
+                        currentAmount = 1;
+                    } else {
+                        currentAmount = currentAmount + 1;
+                    }
+                    certificateIdsAmount.put(certificate.getId(), currentAmount);
+                }
+            }
+        }
+        Set<Long> ids = new HashSet<>();
+        for (Map.Entry<Long, Integer> elem : certificateIdsAmount.entrySet()) {
+            if (elem.getValue().equals(tagNames.size())) {
+                ids.add(elem.getKey());
+            }
+        }
+        return ids;
+    }
 }
