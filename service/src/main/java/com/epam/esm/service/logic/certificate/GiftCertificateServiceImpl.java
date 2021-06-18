@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
@@ -112,12 +113,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
 
-        if (tagNames == null) {
-            tagNames = new ArrayList<>();
-        }
         partInfo = "%" + partInfo + "%";
+        if (tagNames == null || tagNames.isEmpty()) {
+            return certificateRepository.findAllByPartInfo(partInfo, pageRequest);
+        }
+        Set<Long> certificateIds = findIdsByTagName(tagNames);
         return certificateRepository.findAllByIdsAndPartInfo(
-                null, partInfo, pageRequest);
+                certificateIds, partInfo, pageRequest);
     }
 
     @Override
@@ -192,4 +194,29 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
     }
 
+    private Set<Long> findIdsByTagName(List<String> tagNames) {
+        Map<Long, Integer> certificateIdsAmount = new HashMap<>();
+        for (String name : tagNames) {
+            Optional<Tag> optionalTag = tagRepository.findByName(name);
+            if (optionalTag.isPresent()) {
+                Tag tag = optionalTag.get();
+                for (GiftCertificate certificate : tag.getCertificates()) {
+                    Integer currentAmount = certificateIdsAmount.get(certificate.getId());
+                    if (currentAmount == null) {
+                        currentAmount = 1;
+                    } else {
+                        currentAmount = currentAmount + 1;
+                    }
+                    certificateIdsAmount.put(certificate.getId(), currentAmount);
+                }
+            }
+        }
+        Set<Long> ids = new HashSet<>();
+        for (Map.Entry<Long, Integer> elem : certificateIdsAmount.entrySet()) {
+            if (elem.getValue().equals(tagNames.size())) {
+                ids.add(elem.getKey());
+            }
+        }
+        return ids;
+    }
 }

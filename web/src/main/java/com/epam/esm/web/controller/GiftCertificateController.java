@@ -66,7 +66,7 @@ public class GiftCertificateController {
     @GetMapping("/with_tags")
     @ResponseStatus(HttpStatus.OK)
     public List<GiftCertificateDto> getAllWithTags(
-            @RequestParam(name = "tag_name", defaultValue = "[]", required = false) List<String> tagNames,
+            @RequestParam(name = "tag_name", required = false) List<String> tagNames,
             @RequestParam(name = "part_info", defaultValue = "", required = false) String partInfo,
             @RequestParam(name = "sort", required = false) List<String> sortColumns,
             @RequestParam(name = "order", required = false) List<String> orderTypes,
