@@ -3,12 +3,11 @@ package com.epam.esm.service.logic.certificate;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Tag;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
-import com.epam.esm.persistence.repository.data.OrderRepository;
-import com.epam.esm.persistence.repository.data.TagRepository;
-import com.epam.esm.persistence.repository.data.UserRepository;
+import com.epam.esm.persistence.repository.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.OrderRepository;
+import com.epam.esm.persistence.repository.TagRepository;
+import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.*;
-import com.epam.esm.persistence.model.SortParamsContext;
 import com.epam.esm.service.validator.SortParamsContextValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Predicate;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
@@ -113,6 +111,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
 
+        if (partInfo == null || partInfo.isEmpty()) {
+            return certificateRepository.findAll(pageRequest).getContent();
+        }
         partInfo = "%" + partInfo + "%";
         if (tagNames == null || tagNames.isEmpty()) {
             return certificateRepository.findAllByPartInfo(partInfo, pageRequest);

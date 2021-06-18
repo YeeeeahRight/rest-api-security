@@ -2,8 +2,8 @@ package com.epam.esm.service.logic.user;
 
 import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.data.RoleRepository;
-import com.epam.esm.persistence.repository.data.UserRepository;
+import com.epam.esm.persistence.repository.RoleRepository;
+import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import org.junit.Test;
@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -54,8 +56,9 @@ public class UserServiceImplTest {
 
     @Test
     public void testGetAllShouldGetAll() {
+        when(userRepository.findAll((Pageable) any())).thenReturn(Page.empty());
         userService.getAll(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(userRepository).findAll();
+        verify(userRepository).findAll((Pageable) any());
     }
 
     @Test(expected = InvalidParametersException.class)

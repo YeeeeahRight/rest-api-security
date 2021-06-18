@@ -2,11 +2,12 @@ package com.epam.esm.service.logic.certificate;
 
 import static org.mockito.Mockito.*;
 
-import com.epam.esm.persistence.model.SortParamsContext;
 import com.epam.esm.persistence.model.entity.Tag;
-import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
-import com.epam.esm.persistence.repository.data.TagRepository;
+import com.epam.esm.persistence.repository.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.OrderRepository;
+import com.epam.esm.persistence.repository.TagRepository;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
+import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import com.epam.esm.service.validator.SortParamsContextValidator;
@@ -15,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -48,7 +50,6 @@ public class GiftCertificateServiceImplTest {
 
     private static final String PART_INFO = "z";
     private static final List<String> SORTING_COLUMN = Collections.singletonList("name");
-    private static final SortParamsContext SORT_PARAMS = new SortParamsContext(SORTING_COLUMN, null);
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 50;
@@ -57,6 +58,10 @@ public class GiftCertificateServiceImplTest {
     private GiftCertificateRepository certificateRepository;
     @MockBean
     private TagRepository tagRepository;
+    @MockBean
+    private OrderRepository orderRepository;
+    @MockBean
+    private UserRepository userRepository;
     @MockBean
     private SortParamsContextValidator sortParamsContextValidator;
     @Autowired
@@ -71,6 +76,7 @@ public class GiftCertificateServiceImplTest {
 
     @Test
     public void testGetAllShouldGetAll() {
+        when(certificateRepository.findAll((Pageable) any())).thenReturn(Page.empty());
         giftCertificateService.getAll(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
         verify(certificateRepository).findAll((Pageable) any());
     }
@@ -101,27 +107,19 @@ public class GiftCertificateServiceImplTest {
 
     @Test
     public void getAllWithTagsShouldGetWhenFilteringAndSortingNotExist() {
+        when(certificateRepository.findAll((Pageable) any())).thenReturn(Page.empty());
         giftCertificateService.getAllWithTagsWithFilteringSorting(null, null,
                 null, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).findAllByIdsAndPartInfo(
-                any(), any(), any());
+        verify(certificateRepository).findAll((Pageable) any());
     }
 
     @Test
     public void getAllWithTagsShouldGetWithFilteringWhenFilteringExist() {
+        when(certificateRepository.findAllByPartInfo(eq(PART_INFO), any())).thenReturn(Collections.emptyList());
         giftCertificateService.getAllWithTagsWithFilteringSorting(null, PART_INFO, null,
                 null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).findAllByIdsAndPartInfo(
-                any(), eq(PART_INFO) , any());
+        verify(certificateRepository).findAllByPartInfo(any(), any());
     }
-
-//    @Test
-//    public void getAllWithTagsShouldGetWithSortingWhenSortingExist() {
-//        when(sortParamsContextValidator.isValid(any())).thenReturn(true);
-//        giftCertificateService.getAllWithTagsWithFilteringSorting(null, null,
-//                SORTING_COLUMN, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-//        verify(certificateRepository).getAllWithSortingFiltering(eq(SORT_PARAMS), any(), any(), any());
-//    }
 
     @Test(expected = InvalidParametersException.class)
     public void getAllWithTagsShouldThrowsInvalidParametersExceptionWhenSortParamsInvalid() {
@@ -129,14 +127,6 @@ public class GiftCertificateServiceImplTest {
         giftCertificateService.getAllWithTagsWithFilteringSorting(null, null,
                 SORTING_COLUMN, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
     }
-
-//    @Test
-//    public void getAllWithTagsShouldGetWithSoringAndFilteringWhenSoringAndFilteringExist() {
-//        when(sortParamsContextValidator.isValid(any())).thenReturn(true);
-//        giftCertificateService.getAllWithTagsWithFilteringSorting(null, PART_INFO,
-//                SORTING_COLUMN, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-//        verify(certificateRepository).getAllWithSortingFiltering(eq(SORT_PARAMS), any(), eq(PART_INFO), any());
-//    }
 
     @Test
     public void testUpdateByIdShouldUpdateWhenFound() {

@@ -1,4 +1,4 @@
-package com.epam.esm.persistence.model;
+package com.epam.esm.service.logic.certificate;
 
 import java.util.List;
 import java.util.Objects;

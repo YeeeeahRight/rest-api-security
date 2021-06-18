@@ -3,8 +3,8 @@ package com.epam.esm.service.logic.tag;
 import static org.mockito.Mockito.*;
 
 import com.epam.esm.persistence.model.entity.Tag;
-import com.epam.esm.persistence.repository.data.TagRepository;
-import com.epam.esm.persistence.repository.data.UserRepository;
+import com.epam.esm.persistence.repository.TagRepository;
+import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.DuplicateEntityException;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -51,8 +53,9 @@ public class TagServiceImplTest {
 
     @Test
     public void testGetAllShouldGetAll() {
+        when(tagRepository.findAll((Pageable) any())).thenReturn(Page.empty());
         tagService.getAll(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(tagRepository).findAll();
+        verify(tagRepository).findAll((Pageable) any());
     }
 
     @Test(expected = InvalidParametersException.class)

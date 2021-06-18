@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.epam.esm")
-@EnableJpaRepositories("com.epam.esm.persistence.repository.data")
+@EnableJpaRepositories("com.epam.esm.persistence.repository")
 public class Application implements WebMvcConfigurer {
 
     public static void main(String[] args) {

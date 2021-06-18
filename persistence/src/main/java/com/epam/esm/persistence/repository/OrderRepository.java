@@ -1,4 +1,4 @@
-package com.epam.esm.persistence.repository.data;
+package com.epam.esm.persistence.repository;
 
 import com.epam.esm.persistence.model.entity.Order;
 import org.springframework.data.domain.Pageable;

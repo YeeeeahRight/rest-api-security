@@ -3,8 +3,6 @@ package com.epam.esm.persistence.repository;
 import com.epam.esm.persistence.config.TestJpaConfig;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Tag;
-import com.epam.esm.persistence.model.SortParamsContext;
-import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

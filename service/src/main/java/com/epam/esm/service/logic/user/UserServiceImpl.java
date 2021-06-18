@@ -2,8 +2,8 @@ package com.epam.esm.service.logic.user;
 
 import com.epam.esm.persistence.model.entity.Role;
 import com.epam.esm.persistence.model.entity.User;
-import com.epam.esm.persistence.repository.data.RoleRepository;
-import com.epam.esm.persistence.repository.data.UserRepository;
+import com.epam.esm.persistence.repository.RoleRepository;
+import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.DuplicateEntityException;
 import com.epam.esm.service.exception.ExceptionMessageKey;
 import com.epam.esm.service.exception.InvalidParametersException;
