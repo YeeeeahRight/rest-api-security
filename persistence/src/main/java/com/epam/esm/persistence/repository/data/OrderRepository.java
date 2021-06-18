@@ -21,4 +21,12 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
      * @return founded orders
      */
     List<Order> findAllByUserId(long userId, Pageable pageable);
+
+    /**
+     * Gets all Orders by Certificate id
+     *
+     * @param certificateId Certificate id to search
+     * @return founded orders
+     */
+    List<Order> findAllByCertificateId(long userId);
 }

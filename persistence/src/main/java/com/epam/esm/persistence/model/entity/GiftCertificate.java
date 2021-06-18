@@ -30,7 +30,7 @@ public class GiftCertificate extends AbstractEntity {
     @Column(name = "duration", nullable = false)
     private int duration;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(name = "certificates_tags",
             joinColumns = @JoinColumn(name = "certificate_id", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "ID")

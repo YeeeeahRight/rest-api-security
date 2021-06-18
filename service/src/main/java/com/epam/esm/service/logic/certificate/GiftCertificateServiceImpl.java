@@ -2,8 +2,11 @@ package com.epam.esm.service.logic.certificate;
 
 import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Tag;
+import com.epam.esm.persistence.model.entity.User;
 import com.epam.esm.persistence.repository.data.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.data.OrderRepository;
 import com.epam.esm.persistence.repository.data.TagRepository;
+import com.epam.esm.persistence.repository.data.UserRepository;
 import com.epam.esm.service.exception.*;
 import com.epam.esm.persistence.model.SortParamsContext;
 import com.epam.esm.service.validator.SortParamsContextValidator;
@@ -21,14 +24,20 @@ import java.util.*;
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository certificateRepository;
     private final TagRepository tagRepository;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
     private final SortParamsContextValidator sortParametersValidator;
 
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateRepository certificateRepository,
                                       TagRepository tagRepository,
+                                      OrderRepository orderRepository,
+                                      UserRepository userRepository,
                                       SortParamsContextValidator sortParametersValidator) {
         this.certificateRepository = certificateRepository;
         this.tagRepository = tagRepository;
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
         this.sortParametersValidator = sortParametersValidator;
     }
 
@@ -108,7 +117,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
         partInfo = "%" + partInfo + "%";
         return certificateRepository.findAllByIdsAndPartInfo(
-                tagNames, partInfo, pageRequest);
+                null, partInfo, pageRequest);
     }
 
     @Override
@@ -135,6 +144,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (!certificateOptional.isPresent()) {
             throw new NoSuchEntityException(ExceptionMessageKey.CERTIFICATE_NOT_FOUND);
         }
+        GiftCertificate giftCertificate = certificateOptional.get();
+        for (Tag tag : giftCertificate.getTags()) {
+            tag.getCertificates().remove(giftCertificate);
+        }
+        orderRepository.findAllByCertificateId(id).forEach(order -> {
+            Optional<User> userOptional = userRepository.findById(order.getId());
+            userOptional.ifPresent(user -> user.getOrders().remove(order));
+            orderRepository.deleteById(order.getId());
+        });
         certificateRepository.deleteById(id);
     }
 

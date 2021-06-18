@@ -1,6 +1,7 @@
 package com.epam.esm.service.logic.tag;
 
 import com.epam.esm.persistence.model.BestUserTag;
+import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Tag;
 import com.epam.esm.persistence.repository.data.TagRepository;
 import com.epam.esm.persistence.repository.data.UserRepository;
@@ -72,7 +73,9 @@ public class TagServiceImpl implements TagService {
             throw new NoSuchEntityException(ExceptionMessageKey.TAG_NOT_FOUND);
         }
         Tag tag = optionalTag.get();
-        tag.setCertificates(null);
+        for (GiftCertificate giftCertificate : tag.getCertificates()) {
+            giftCertificate.getTags().remove(tag);
+        }
         tagRepository.deleteById(id);
     }
 
