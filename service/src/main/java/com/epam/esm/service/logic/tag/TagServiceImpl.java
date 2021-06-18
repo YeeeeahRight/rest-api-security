@@ -1,8 +1,9 @@
 package com.epam.esm.service.logic.tag;
 
 import com.epam.esm.persistence.model.BestUserTag;
-import com.epam.esm.persistence.repository.TagRepository;
+import com.epam.esm.persistence.model.entity.GiftCertificate;
 import com.epam.esm.persistence.model.entity.Tag;
+import com.epam.esm.persistence.repository.TagRepository;
 import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.ExceptionMessageKey;
 import com.epam.esm.service.exception.InvalidParametersException;
@@ -38,7 +39,7 @@ public class TagServiceImpl implements TagService {
             throw new DuplicateEntityException(ExceptionMessageKey.TAG_EXIST);
         }
 
-        return tagRepository.create(tag);
+        return tagRepository.save(tag);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class TagServiceImpl implements TagService {
             throw new InvalidParametersException(ExceptionMessageKey.INVALID_PAGINATION);
         }
 
-        return tagRepository.getAll(pageRequest);
+        return tagRepository.findAll(pageRequest).getContent();
     }
 
     @Override
@@ -70,6 +71,10 @@ public class TagServiceImpl implements TagService {
         Optional<Tag> optionalTag = tagRepository.findById(id);
         if (!optionalTag.isPresent()) {
             throw new NoSuchEntityException(ExceptionMessageKey.TAG_NOT_FOUND);
+        }
+        Tag tag = optionalTag.get();
+        for (GiftCertificate giftCertificate : tag.getCertificates()) {
+            giftCertificate.getTags().remove(tag);
         }
         tagRepository.deleteById(id);
     }

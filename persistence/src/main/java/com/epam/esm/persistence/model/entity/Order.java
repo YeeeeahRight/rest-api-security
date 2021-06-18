@@ -15,7 +15,7 @@ public class Order extends AbstractEntity {
     @Column(name = "order_date", nullable = false, updatable = false)
     private ZonedDateTime orderDate;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "cost", nullable = false, updatable = false)
     private BigDecimal cost;
 
     @ManyToOne
@@ -23,7 +23,7 @@ public class Order extends AbstractEntity {
     private User user;
 
     @OneToOne
-    @JoinColumn(name="certificate_id", nullable = false)
+    @JoinColumn(name = "certificate_id", nullable = false)
     private GiftCertificate certificate;
 
     public Order() {

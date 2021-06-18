@@ -1,4 +1,4 @@
-package com.epam.esm.web.dto;
+package com.epam.esm.web.dto.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,24 +8,21 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Objects;
 
-public class UserDto extends RepresentationModel<UserDto>  {
+public class TagDto extends RepresentationModel<TagDto> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long id;
 
     @NotNull(message = "entity.data.missing")
-    @Size(min = 1, max = 60, message = "user.invalid")
+    @Size(min = 1, max = 60, message = "tag.invalid")
     private String name;
 
     @JsonCreator
-    public UserDto() {
+    public TagDto() {
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
+    public TagDto(long id, String name) {
         this.id = id;
+        this.name = name;
     }
 
     public String getName() {
@@ -36,14 +33,22 @@ public class UserDto extends RepresentationModel<UserDto>  {
         this.name = name;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserDto userDto = (UserDto) o;
+        TagDto tagDto = (TagDto) o;
 
-        return Objects.equals(name, userDto.name);
+        return Objects.equals(name, tagDto.name);
     }
 
     @Override

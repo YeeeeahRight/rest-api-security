@@ -2,10 +2,11 @@ package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.entity.Order;
 import com.epam.esm.service.logic.order.OrderService;
-import com.epam.esm.web.dto.OrderDto;
+import com.epam.esm.web.dto.entity.OrderDto;
 import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.link.LinkAdder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('orders:create')")
     public OrderDto createOrder(@PathVariable long userId,
                                 @RequestParam(name = "certificate_id") long certificateId) {
         Order order = orderService.create(userId, certificateId);

@@ -12,13 +12,13 @@ import java.util.*;
 @Table(name = "certificates")
 public class GiftCertificate extends AbstractEntity {
 
-    @Column(length = 80, nullable = false)
+    @Column(name = "name", length = 80, nullable = false)
     private String name;
 
-    @Column(length = 200, nullable = false)
+    @Column(name = "description", length = 200, nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
 
     @Column(name = "create_date", nullable = false, updatable = false)
@@ -27,13 +27,13 @@ public class GiftCertificate extends AbstractEntity {
     @Column(name = "last_update_date", nullable = false)
     private ZonedDateTime lastUpdateDate;
 
-    @Column(nullable = false)
+    @Column(name = "duration", nullable = false)
     private int duration;
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinTable(name="certificates_tags",
-            joinColumns = @JoinColumn(name="certificate_id", referencedColumnName = "ID"),
-            inverseJoinColumns = @JoinColumn(name="tag_id", referencedColumnName = "ID")
+    @JoinTable(name = "certificates_tags",
+            joinColumns = @JoinColumn(name = "certificate_id", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "ID")
     )
     private Set<Tag> tags = new HashSet<>();
 

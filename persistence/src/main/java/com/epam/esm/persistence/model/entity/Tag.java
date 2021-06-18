@@ -1,20 +1,26 @@
 package com.epam.esm.persistence.model.entity;
 
 import com.epam.esm.persistence.audit.EntityAuditListener;
+import com.epam.esm.persistence.query.NativeQuery;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedNativeQuery(
+        name = "findUserMostWidelyUsedTagWithHighestOrderCost",
+        query = NativeQuery.MOST_WIDELY_USED_WITH_HIGHEST_ORDER_COST_TAG_QUERY,
+        resultSetMapping = "bestTagMapping"
+)
 @EntityListeners(EntityAuditListener.class)
 @Table(name = "tags")
 public class Tag extends AbstractEntity{
 
-    @Column(length = 60, nullable = false, unique = true)
+    @Column(name="name", length = 60, nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "tags")
     private List<GiftCertificate> certificates = new ArrayList<>();
 
     public Tag() {

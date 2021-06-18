@@ -2,11 +2,12 @@ package com.epam.esm.service.logic.certificate;
 
 import static org.mockito.Mockito.*;
 
-import com.epam.esm.persistence.model.SortParamsContext;
 import com.epam.esm.persistence.model.entity.Tag;
-import com.epam.esm.persistence.repository.impl.GiftCertificateRepositoryImpl;
-import com.epam.esm.persistence.repository.impl.TagRepositoryImpl;
+import com.epam.esm.persistence.repository.GiftCertificateRepository;
+import com.epam.esm.persistence.repository.OrderRepository;
+import com.epam.esm.persistence.repository.TagRepository;
 import com.epam.esm.persistence.model.entity.GiftCertificate;
+import com.epam.esm.persistence.repository.UserRepository;
 import com.epam.esm.service.exception.InvalidParametersException;
 import com.epam.esm.service.exception.NoSuchEntityException;
 import com.epam.esm.service.validator.SortParamsContextValidator;
@@ -15,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
@@ -34,7 +37,7 @@ public class GiftCertificateServiceImplTest {
     private static final ZonedDateTime CREATE_TIME = ZonedDateTime.now();
     private static final int DURATION = 5;
     private static final GiftCertificate GIFT_CERTIFICATE = new GiftCertificate(
-            ID, NAME, DESCRIPTION,PRICE, CREATE_TIME, UPDATE_TIME, DURATION
+            ID, NAME, DESCRIPTION, PRICE, CREATE_TIME, UPDATE_TIME, DURATION
     );
     private static final Tag TAG = new Tag(ID, "new");
     private static final GiftCertificate GIFT_CERTIFICATE_WITH_TAGS = new GiftCertificate(
@@ -47,15 +50,18 @@ public class GiftCertificateServiceImplTest {
 
     private static final String PART_INFO = "z";
     private static final List<String> SORTING_COLUMN = Collections.singletonList("name");
-    private static final SortParamsContext SORT_PARAMS = new SortParamsContext(SORTING_COLUMN, null);
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 50;
 
     @MockBean
-    private GiftCertificateRepositoryImpl certificateRepository;
+    private GiftCertificateRepository certificateRepository;
     @MockBean
-    private TagRepositoryImpl tagRepository;
+    private TagRepository tagRepository;
+    @MockBean
+    private OrderRepository orderRepository;
+    @MockBean
+    private UserRepository userRepository;
     @MockBean
     private SortParamsContextValidator sortParamsContextValidator;
     @Autowired
@@ -65,13 +71,14 @@ public class GiftCertificateServiceImplTest {
     @Test
     public void testCreateShouldCreateWhenNotExist() {
         giftCertificateService.create(GIFT_CERTIFICATE);
-        verify(certificateRepository).create(GIFT_CERTIFICATE);
+        verify(certificateRepository).save(GIFT_CERTIFICATE);
     }
 
     @Test
     public void testGetAllShouldGetAll() {
+        when(certificateRepository.findAll((Pageable) any())).thenReturn(Page.empty());
         giftCertificateService.getAll(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).getAll(any());
+        verify(certificateRepository).findAll((Pageable) any());
     }
 
     @Test(expected = InvalidParametersException.class)
@@ -100,24 +107,18 @@ public class GiftCertificateServiceImplTest {
 
     @Test
     public void getAllWithTagsShouldGetWhenFilteringAndSortingNotExist() {
+        when(certificateRepository.findAll((Pageable) any())).thenReturn(Page.empty());
         giftCertificateService.getAllWithTagsWithFilteringSorting(null, null,
                 null, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).getAllWithSortingFiltering(any(), any(), any(), any());
+        verify(certificateRepository).findAll((Pageable) any());
     }
 
     @Test
     public void getAllWithTagsShouldGetWithFilteringWhenFilteringExist() {
+        when(certificateRepository.findAllByPartInfo(eq(PART_INFO), any())).thenReturn(Collections.emptyList());
         giftCertificateService.getAllWithTagsWithFilteringSorting(null, PART_INFO, null,
                 null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).getAllWithSortingFiltering(any(), any(), eq(PART_INFO), any());
-    }
-
-    @Test
-    public void getAllWithTagsShouldGetWithSortingWhenSortingExist() {
-        when(sortParamsContextValidator.isValid(any())).thenReturn(true);
-        giftCertificateService.getAllWithTagsWithFilteringSorting(null, null,
-                SORTING_COLUMN, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).getAllWithSortingFiltering(eq(SORT_PARAMS), any(), any(), any());
+        verify(certificateRepository).findAllByPartInfo(any(), any());
     }
 
     @Test(expected = InvalidParametersException.class)
@@ -128,25 +129,18 @@ public class GiftCertificateServiceImplTest {
     }
 
     @Test
-    public void getAllWithTagsShouldGetWithSoringAndFilteringWhenSoringAndFilteringExist() {
-        when(sortParamsContextValidator.isValid(any())).thenReturn(true);
-        giftCertificateService.getAllWithTagsWithFilteringSorting(null, PART_INFO,
-                SORTING_COLUMN, null, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
-        verify(certificateRepository).getAllWithSortingFiltering(eq(SORT_PARAMS), any(), eq(PART_INFO), any());
-    }
-
-    @Test
     public void testUpdateByIdShouldUpdateWhenFound() {
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(GIFT_CERTIFICATE));
         giftCertificateService.updateById(ID, GIFT_CERTIFICATE);
-        verify(certificateRepository).update(GIFT_CERTIFICATE);
+        verify(certificateRepository).save(GIFT_CERTIFICATE);
     }
 
     @Test
     public void testUpdateByIdShouldCreateTagWhenNewTagPassed() {
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(GIFT_CERTIFICATE_WITH_TAGS));        when(tagRepository.findByName(any())).thenReturn(Optional.empty());
+        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(GIFT_CERTIFICATE_WITH_TAGS));
+        when(tagRepository.findByName(any())).thenReturn(Optional.empty());
         giftCertificateService.updateById(ID, GIFT_CERTIFICATE_WITH_TAGS);
-        verify(tagRepository).create(TAG);
+        verify(tagRepository).save(TAG);
     }
 
     @Test(expected = NoSuchEntityException.class)

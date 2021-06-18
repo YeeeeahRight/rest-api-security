@@ -1,8 +1,9 @@
 package com.epam.esm.web.link;
 
 import com.epam.esm.web.controller.GiftCertificateController;
-import com.epam.esm.web.dto.GiftCertificateDto;
-import com.epam.esm.web.dto.TagDto;
+import com.epam.esm.web.dto.entity.GiftCertificateDto;
+import com.epam.esm.web.dto.entity.TagDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,6 +12,7 @@ public class GiftCertificateLinkAdder extends AbstractLinkAdder<GiftCertificateD
 
     private final LinkAdder<TagDto> tagDtoLinkAdder;
 
+    @Autowired
     public GiftCertificateLinkAdder(LinkAdder<TagDto> tagDtoLinkAdder) {
         this.tagDtoLinkAdder = tagDtoLinkAdder;
     }

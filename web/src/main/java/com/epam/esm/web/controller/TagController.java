@@ -1,12 +1,13 @@
 package com.epam.esm.web.controller;
 
 import com.epam.esm.persistence.model.entity.Tag;
-import com.epam.esm.web.dto.TagDto;
+import com.epam.esm.web.dto.entity.TagDto;
 import com.epam.esm.service.logic.tag.TagService;
 import com.epam.esm.web.dto.converter.DtoConverter;
 import com.epam.esm.web.link.LinkAdder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,6 +33,7 @@ public class TagController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('tags:create')")
     public TagDto create(@RequestBody @Valid TagDto tagDto) {
         Tag tag = tagDtoConverter.convertToEntity(tagDto);
         tag = tagService.create(tag);
@@ -65,6 +67,7 @@ public class TagController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('tags:delete')")
     public void deleteById(@PathVariable("id") long id) {
         tagService.deleteById(id);
     }

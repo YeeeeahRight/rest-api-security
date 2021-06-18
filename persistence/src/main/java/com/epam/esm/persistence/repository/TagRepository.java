@@ -2,19 +2,23 @@ package com.epam.esm.persistence.repository;
 
 import com.epam.esm.persistence.model.BestUserTag;
 import com.epam.esm.persistence.model.entity.Tag;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
  * Repository interface for Tag
  */
-public interface TagRepository extends EntityRepository<Tag> {
+@Repository
+public interface TagRepository extends PagingAndSortingRepository<Tag, Long> {
 
     /**
-     * Finds Tag by name.
+     * Finds role by name.
      *
-     * @param name Tag name to find
-     * @return Optional Tag - Tag if founded or Empty if not
+     * @param name the name to find
+     * @return the optional role
      */
     Optional<Tag> findByName(String name);
 
@@ -24,5 +28,6 @@ public interface TagRepository extends EntityRepository<Tag> {
      * @param userId User id to search
      * @return Optional BestUserTag - BestUserTag if founded or Empty if not
      */
+    @Query(name = "findUserMostWidelyUsedTagWithHighestOrderCost", nativeQuery = true)
     Optional<BestUserTag> findUserMostWidelyUsedTagWithHighestOrderCost(long userId);
 }
